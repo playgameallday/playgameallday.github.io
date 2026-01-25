@@ -636,13 +636,11 @@ async function deletePet(petId) {
 
   if (error) {
     alert('ลบไม่ได้: ' + error.message);
-	loadPets();
-	//location.reload();
+	location.reload();
 	return;
   } else {
     loadPets();
     alert('ลบเรียบร้อย');
-    //loadPets();
   }
 
   
