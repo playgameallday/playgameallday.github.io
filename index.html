@@ -635,14 +635,13 @@ async function deletePet(petId) {
     .eq('id', petId)
 
   if (error) {
-    alert('ลบไม่ได้: ' + error.message)
+    alert('ลบไม่ได้: ' + error.message);
 	return;
   } else {
-    alert('ลบเรียบร้อย')
-    loadPets()
+    alert('ลบเรียบร้อย');
+    loadPets();
   }
 
-  }
   
   if (markers[petId]) {
     map.removeLayer(markers[petId]);
