@@ -636,6 +636,7 @@ async function deletePet(petId) {
 
   if (error) {
     alert('ลบไม่ได้: ' + error.message);
+	location.reload();
 	return;
   } else {
     alert('ลบเรียบร้อย');
