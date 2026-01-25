@@ -619,7 +619,6 @@ function addMarker(pet) {
 
 /* ========== deletePet ========== */
 async function deletePet(petId) {
-  loadPets()
   if (!petId) {
     alert("ไม่พบ ID หมุด");
     return;
@@ -637,21 +636,18 @@ async function deletePet(petId) {
 
   if (error) {
     alert('ลบไม่ได้: ' + error.message)
-	//loadPets()
+	return;
   } else {
     alert('ลบเรียบร้อย')
     loadPets()
-	if (markers[petId]) {
-    map.removeLayer(markers[petId]);
-    delete markers[petId];
   }
 
   }
   
-  /*if (markers[petId]) {
+  if (markers[petId]) {
     map.removeLayer(markers[petId]);
     delete markers[petId];
-  }*/
+  }
   
 }
 
