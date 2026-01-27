@@ -627,7 +627,8 @@ function addMarker(pet) {
       ? [pet.image]
       : [];
 
-  const icon = images[0] || paw.png;
+  const icon = images[0] || 'paw.png';
+  console.log(icon);
   
   const gallery = (pet.image || []).map(url => `
     <img
