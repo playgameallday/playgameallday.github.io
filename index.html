@@ -623,7 +623,7 @@ function addMarker(pet) {
   const images = normalizeImages(pet.image);
   //console.log("images:", images[0]);
   //const icon = createPetIcon("https://playgameallday.github.io/paw.png");
-  const icon = createPetIcon(images[0]);
+  const icon = createPetIcon(pet, images[0]);
   //console.log("icon:", icon);
   
   const gallery = images.map(url => `
@@ -780,10 +780,10 @@ function copyLocation(lat, lng) {
 
 
 /* ========== PetIcon ========== */
-function createPetIcon(pet) {
+function createPetIcon(pet,image) {
   return L.icon({
     //iconUrl: pet.image?.[0] || pet.image || "paw.png",
-	iconUrl: pet || "paw.png",
+	iconUrl: image || "paw.png",
     iconSize: [42, 42],
     iconAnchor: [21, 42],
     popupAnchor: [0, -42],
