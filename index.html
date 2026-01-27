@@ -475,7 +475,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     loginBtn.style.display = "inline-block";
     userBox.style.display = "none";
   }
-  console.log("currentUser1:",currentUser);
+  //console.log("currentUser1:",currentUser);
   Createshortcut(currentUser);
 });
 
@@ -865,17 +865,11 @@ function shortcutIcon(iconUrl) {
     popupAnchor: [0, -36]
   });
 }
-//console.log("currentUser: ",currentUser);
-
-//if (currentUser){
-//Createshortcut(currentUser.image);
-//console.log("1");
-//}
 
 async function Createshortcut(currentUser) {
-console.log("currentUser2:",currentUser);
+//console.log("currentUser2:",currentUser);
 if (currentUser){
-console.log("currentUser3:",currentUser);
+//console.log("currentUser3:",currentUser);
 const { data: pets, error } = await supabaseClient
   .from("pets")
   .select("id, lat, lng, image, created_at")
@@ -916,9 +910,8 @@ userPets.forEach((pet, index) => {
 
   const img = document.createElement("img");
   const images2 = normalizeImages(pet.image);
-  
-  const icon = shortcutIcon(images2[0]);
-  img.src = icon;
+
+  img.src = images2[0] || "paw.png";
 
   btn.appendChild(img);
 
