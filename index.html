@@ -537,9 +537,23 @@ function toggleOtherAnimal(){
 
 /* ========== SAVE ========== */
 async function savePet(){
-  //console.log("🔥 savePet called1");
   if(!clickLatLng) return;
-  //console.log("🔥 savePet called2");
+  
+  const { count, error: countError } = await supabaseClient
+  .from("pets")
+  .select("*", { count: "exact", head: true })
+  .eq("user_id", currentUser.id);
+
+  if (countError) {
+    alert("เช็คจำนวนหมุดไม่สำเร็จ");
+    return;
+  }
+
+  if (count >= 3) {
+    alert("คุณปักหมุดได้ไม่เกิน 3 จุด");
+    return;
+  }
+  
   const animalSel = document.getElementById('animal').value;
   const animal =
     animalSel === 'อื่นๆ(Other)'
