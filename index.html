@@ -867,10 +867,13 @@ function shortcutIcon(iconUrl) {
 
 if (currentUser){
 Createshortcut(currentUser.image);
+console.log("1");
 }
 
 async function Createshortcut(image) {
+console.log("2");
 if (currentUser){
+console.log("3n");
 const { data: pets, error } = await supabaseClient
   .from("pets")
   .select("id, lat, lng, created_at")
