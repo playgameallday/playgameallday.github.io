@@ -888,9 +888,10 @@ if (error) {
   return;
 }
 
-const userMarkers = [];   // เก็บ marker leaflet
+//const userMarkers = [];   // เก็บ marker leaflet
 const userPets = [];     // เก็บข้อมูลจาก DB
 
+/*
 pets.forEach((pet) => {
 
   const images2 = normalizeImages(pet.image);
@@ -905,6 +906,7 @@ pets.forEach((pet) => {
   userMarkers.push(marker);
   userPets.push(pet);
 });
+*/
 
 const shortcut = document.getElementById("marker-shortcut");
 shortcut.innerHTML = "";
@@ -914,7 +916,10 @@ userPets.forEach((pet, index) => {
   btn.className = "marker-btn";
 
   const img = document.createElement("img");
-  img.src = pet.icon_url;
+  const images2 = normalizeImages(pet.image);
+  
+  const icon = shortcutIcon(images2[0]);
+  img.src = icon;
 
   btn.appendChild(img);
 
