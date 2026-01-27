@@ -620,26 +620,32 @@ async function loadPets(){
 const markers = {};
 function addMarker(pet) {
 
-  ///const icon = createPetIcon(pet);
-  /*const images = Array.isArray(pet.image)
-    ? pet.image
-    : pet.image
-      ? [pet.image]
-      : [];
-  */
-  //const icon = images[0] || 'paw.png';
-  //const icon = pet.image?.[0] || pet.image || "paw.png";
   const icon = createPetIcon(pet);
   
   console.log(icon);
-  const gallery = (pet.image || []).map(url => `
+  
+  const images = Array.isArray(pet.image)
+  ? pet.image
+  : pet.image
+    ? [pet.image]
+    : [];
+  
+  /*const gallery = (pet.image || []).map(url => `
     <img
       src="${url}"
       class="popup-thumb"
       onclick="openImage('${url}')"
     >
   `).join('');
-
+  */
+  const gallery = images.map(url => `
+  <img
+    src="${url}"
+    class="popup-thumb"
+    onclick="openImage('${url}')"
+  >
+  `).join('');
+  
   let popupHtml = `
     <div class="popup">
       <div class="popup-gallery">
