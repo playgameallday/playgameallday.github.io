@@ -622,12 +622,12 @@ function addMarker(pet) {
 
   //const icon = createPetIcon(pet);
   
-  console.log(icon);
+  //console.log(icon);
   
   const images = normalizeImages(pet.image);
   
   const icon = createPetIcon(images[0]);
-  
+  console.log(icon);
   const gallery = images.map(url => `
   <img
     src="${url}"
