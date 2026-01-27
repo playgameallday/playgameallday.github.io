@@ -475,9 +475,8 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     loginBtn.style.display = "inline-block";
     userBox.style.display = "none";
   }
-  
-  Createshortcut(currentUser);
   console.log("currentUser1:",currentUser);
+  Createshortcut(currentUser);
 });
 
 function updateUI() {
@@ -891,9 +890,9 @@ if (error) {
 //const userMarkers = [];   // เก็บ marker leaflet
 const userPets = [];     // เก็บข้อมูลจาก DB
 
-/*
-pets.forEach((pet) => {
 
+pets.forEach((pet) => {
+  /*
   const images2 = normalizeImages(pet.image);
   
   const icon = shortcutIcon(images2[0]);
@@ -903,10 +902,10 @@ pets.forEach((pet) => {
     { icon }
   ).addTo(map);
 
-  userMarkers.push(marker);
+  userMarkers.push(marker);*/
   userPets.push(pet);
 });
-*/
+
 
 const shortcut = document.getElementById("marker-shortcut");
 shortcut.innerHTML = "";
