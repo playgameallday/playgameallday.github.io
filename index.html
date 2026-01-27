@@ -24,6 +24,7 @@
   </div>
 </div>
 
+<div id="marker-shortcut"></div>
 
 <style>
   body { margin:0; font-family: system-ui, sans-serif; }
@@ -223,6 +224,33 @@ button {
   border: 1px solid #ccc;
 }
 
+#marker-shortcut {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column-reverse; /* ดันจากล่างขึ้นบน */
+  gap: 10px;
+  z-index: 1000;
+}
+
+.marker-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #ff4d4f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.marker-btn img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
   
 </style>
 </head>
@@ -312,6 +340,7 @@ button {
 
 <script>
 
+/* ========== Protect uploadImages <5 ========== */
 const imageInput = document.getElementById('images');
 const preview = document.getElementById('imagePreview');
 
@@ -334,7 +363,7 @@ imageInput.addEventListener('change', () => {
     preview.appendChild(img);
   });
 });
-
+/* ========== uploadImages ========== */
 async function uploadImages(files, userId) {
   const urls = [];
 
@@ -823,6 +852,79 @@ function openImage(url) {
 
   overlay.onclick = () => overlay.remove();
   document.body.appendChild(overlay);
+}
+
+/* ========== Mark shortcut ========== */
+
+function shortcutIcon(iconUrl) {
+  return L.icon({
+    iconUrl,
+    iconSize: [42, 42],
+    iconAnchor: [21, 42],
+    popupAnchor: [0, -36]
+  });
+}
+
+if (currentUser){
+Createshortcut(currentUser.image);
+}
+
+async function Createshortcut(image) {
+if (currentUser){
+const { data: pets, error } = await supabaseClient
+  .from("pets")
+  .select("id, lat, lng, created_at")
+  .eq("user_id", currentUser.id)
+  .order("created_at", { ascending: true });
+
+if (error) {
+  console.error(error);
+  return;
+}
+
+const userMarkers = [];   // เก็บ marker leaflet
+const userPets = [];     // เก็บข้อมูลจาก DB
+
+const images2 = normalizeImages(image);
+
+pets.forEach((pet) => {
+  const icon = shortcutIcon(images[0]);
+
+  const marker = L.marker(
+    [pet.lat, pet.lng],
+    { icon }
+  ).addTo(map);
+
+  userMarkers.push(marker);
+  userPets.push(pet);
+});
+
+const shortcut = document.getElementById("marker-shortcut");
+shortcut.innerHTML = "";
+
+userPets.forEach((pet, index) => {
+  const btn = document.createElement("div");
+  btn.className = "marker-btn";
+
+  const img = document.createElement("img");
+  img.src = pet.icon_url;
+
+  btn.appendChild(img);
+
+  btn.onclick = () => {
+    map.flyTo(
+      [pet.lat, pet.lng],
+      17,
+      { animate: true, duration: 0.8 }
+    );
+    userMarkers[index].openPopup?.();
+  };
+
+  shortcut.appendChild(btn);
+});
+
+
+}
 }
 
 loadPets();
