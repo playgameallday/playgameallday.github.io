@@ -207,6 +207,22 @@ button {
   background: #999;
   color: #fff;
 }  
+
+.preview-container {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.preview-container img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
   
 </style>
 </head>
@@ -265,11 +281,22 @@ button {
       <label>ติดต่อ</label>
       <input id="contact" placeholder="เบอร์โทร / LINE">
     </div>
-
+<!-- ===== Modal ===== --
     <div class="field">
 	  <label>รูปสัตว์</label>
 	  <input type="file" id="imageFile" accept="image/jpeg, image/png">
 	</div>
+	-->
+	<div class="field">
+	  <label>รูปสัตว์ (ไม่เกิน 5 รูป)</label>
+	  <input
+	  type="file"
+	  id="images"
+	  accept="image/*"
+	  multiple
+	  >
+      <div id="imagePreview" class="preview-container"></div>
+    </div>
 	
 	<div class="field">
 	  <label>ข้อมูลเพิ่มเติม</label>
@@ -284,6 +311,57 @@ button {
 </div>
 
 <script>
+
+const imageInput = document.getElementById('images');
+const preview = document.getElementById('imagePreview');
+
+imageInput.addEventListener('change', () => {
+  preview.innerHTML = '';
+
+  const files = Array.from(imageInput.files);
+
+  if (files.length > 5) {
+    alert("เลือกได้ไม่เกิน 5 รูป");
+    imageInput.value = '';   // reset
+    return;
+  }
+
+  files.forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    preview.appendChild(img);
+  });
+});
+
+async function uploadImages(files, userId) {
+  const urls = [];
+
+  for (const file of files) {
+    const ext = file.name.split('.').pop();
+    const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+    const { error } = await supabaseClient
+      .storage
+      .from('pets')
+      .upload(fileName, file);
+
+    if (error) {
+      console.error("Upload error:", error);
+      continue;
+    }
+
+    const { data } = supabaseClient
+      .storage
+      .from('pets')
+      .getPublicUrl(fileName);
+
+    urls.push(data.publicUrl);
+  }
+
+  return urls;
+}
 
 /* ========== User Location ========== */
 function locateUser() {
@@ -459,41 +537,29 @@ function toggleOtherAnimal(){
 
 /* ========== SAVE ========== */
 async function savePet(){
+  console.log("🔥 savePet called1");
   if(!clickLatLng) return;
-
+  console.log("🔥 savePet called2");
   const animalSel = document.getElementById('animal').value;
   const animal =
     animalSel === 'อื่นๆ(Other)'
       ? document.getElementById('otherAnimal').value
       : animalSel;
 
-  /* ===== UPLOAD IMAGE ===== */
-  let imageUrl = null;
-  const fileInput = document.getElementById('imageFile');
-  const file = fileInput.files[0];
+    const { data: { user } } =
+      await supabaseClient.auth.getUser();
 
-  if(file){
-    const ext = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${ext}`;
+    const files = Array.from(
+      document.getElementById('images').files
+    );
 
-    const { error: uploadError } = await supabaseClient
-      .storage
-      .from('pets')
-      .upload(fileName, file);
-
-    if(uploadError){
-      alert("อัปโหลดรูปไม่สำเร็จ");
-      console.error(uploadError);
+    if (files.length > 5) {
+      alert("รูปเกิน 5 รูป");
       return;
     }
 
-    const { data } = supabaseClient
-      .storage
-      .from('pets')
-      .getPublicUrl(fileName);
-
-    imageUrl = data.publicUrl;
-  }
+    const imageUrl = await uploadImages(files, user.id);
+	
 
   /* ===== SAVE TO DB ===== */
   const today = new Date().toISOString().split('T')[0];
@@ -525,6 +591,7 @@ async function savePet(){
 
   addMarker(pet);
   closeModal();
+  loadPets();
 }
 
 /* ========== LOAD PET========== */
@@ -554,11 +621,19 @@ const markers = {};
 function addMarker(pet) {
 
   const icon = createPetIcon(pet);
+  
+  const gallery = (pet.images || []).map(url => `
+    <img
+      src="${url}"
+      class="popup-thumb"
+      onclick="openImage('${url}')"
+    >
+  `).join('');
 
   let popupHtml = `
     <div class="popup">
-      <div class="popup-img-wrap">
-        ${pet.image ? `<img src="${pet.image}" class="popup-img">` : ""}
+      <div class="popup-gallery">
+        ${gallery || 'ไม่มีรูป'}
       </div>
 
       <div class="popup-info">
