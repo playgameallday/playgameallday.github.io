@@ -784,7 +784,8 @@ function copyLocation(lat, lng) {
 /* ========== PetIcon ========== */
 function createPetIcon(pet) {
   return L.icon({
-    iconUrl: pet.image?.[0] || pet.image || "paw.png",
+    //iconUrl: pet.image?.[0] || pet.image || "paw.png",
+	iconUrl: pet,
     iconSize: [42, 42],
     iconAnchor: [21, 42],
     popupAnchor: [0, -42],
