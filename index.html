@@ -624,20 +624,8 @@ function addMarker(pet) {
   
   console.log(icon);
   
-  const images = Array.isArray(pet.image)
-  ? pet.image
-  : pet.image
-    ? [pet.image]
-    : [];
+  const images = normalizeImages(pet.image);
   
-  /*const gallery = (pet.image || []).map(url => `
-    <img
-      src="${url}"
-      class="popup-thumb"
-      onclick="openImage('${url}')"
-    >
-  `).join('');
-  */
   const gallery = images.map(url => `
   <img
     src="${url}"
@@ -718,6 +706,25 @@ function addMarker(pet) {
 
 	
    markers[pet.id] = marker;
+}
+
+function normalizeImages(image) {
+  if (Array.isArray(image)) return image;
+
+  if (typeof image === "string") {
+    // ถ้าเป็น JSON string
+    if (image.startsWith("[")) {
+      try {
+        return JSON.parse(image);
+      } catch {
+        return [];
+      }
+    }
+    // เป็น url เดี่ยว
+    return [image];
+  }
+
+  return [];
 }
 
 /* ========== deletePet ========== */
