@@ -475,7 +475,9 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     loginBtn.style.display = "inline-block";
     userBox.style.display = "none";
   }
-   
+  
+  Createshortcut(currentUser);
+  
 });
 
 function updateUI() {
@@ -864,17 +866,17 @@ function shortcutIcon(iconUrl) {
     popupAnchor: [0, -36]
   });
 }
-console.log("currentUser: ",currentUser);
+//console.log("currentUser: ",currentUser);
 
-if (currentUser){
-Createshortcut(currentUser.image);
-console.log("1");
-}
+//if (currentUser){
+//Createshortcut(currentUser.image);
+//console.log("1");
+//}
 
-async function Createshortcut(image) {
-console.log("2");
+async function Createshortcut(currentUser) {
+//console.log("2");
 if (currentUser){
-console.log("3n");
+//console.log("3n");
 const { data: pets, error } = await supabaseClient
   .from("pets")
   .select("id, lat, lng, created_at")
@@ -889,10 +891,11 @@ if (error) {
 const userMarkers = [];   // เก็บ marker leaflet
 const userPets = [];     // เก็บข้อมูลจาก DB
 
-const images2 = normalizeImages(image);
-
 pets.forEach((pet) => {
-  const icon = shortcutIcon(images[0]);
+
+  const images2 = normalizeImages(pet.image);
+  
+  const icon = shortcutIcon(images2[0]);
 
   const marker = L.marker(
     [pet.lat, pet.lng],
