@@ -871,7 +871,7 @@ const { data: pets, error } = await supabaseClient
   .from("pets")
   .select("id, lat, lng, image, created_at")
   .eq("user_id", currentUser.id)
-  .order("created_at", { ascending: true });
+  .order("created_at", { ascending: false });
 
 if (error) {
   console.error(error);
