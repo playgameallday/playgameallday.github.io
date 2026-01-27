@@ -477,7 +477,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
   }
   
   Createshortcut(currentUser);
-  
+  console.log("currentUser1:",currentUser);
 });
 
 function updateUI() {
@@ -874,9 +874,9 @@ function shortcutIcon(iconUrl) {
 //}
 
 async function Createshortcut(currentUser) {
-//console.log("2");
+console.log("currentUser2:",currentUser);
 if (currentUser){
-//console.log("3n");
+console.log("currentUser3:",currentUser);
 const { data: pets, error } = await supabaseClient
   .from("pets")
   .select("id, lat, lng, created_at")
