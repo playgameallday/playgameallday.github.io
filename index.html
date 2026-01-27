@@ -203,6 +203,11 @@ button {
   display: none;
 }
   
+.copy-btn {
+  background: #999;
+  color: #fff;
+}  
+  
 </style>
 </head>
 
@@ -593,10 +598,17 @@ function addMarker(pet) {
         <button class="close-btn" onclick="closePopup()">
           ✖ ปิด
         </button>
+		
+		<button class="copy-btn"
+          onclick="copyLocation(${pet.lat}, ${pet.lng})">
+          📋 คัดลอกตำแหน่ง
+        </button>
+		
       </div>
     </div>
   `;
-
+  
+  
    marker = L.marker([pet.lat, pet.lng], { icon })
     .addTo(map)
     .bindPopup(popupHtml);
@@ -655,6 +667,19 @@ async function deletePet(petId) {
 function closePopup() {
   map.closePopup();
 }
+/* ========== copyPopup ========== */
+function copyLocation(lat, lng) {
+  const text = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      alert("คัดลอกตำแหน่งแล้ว:\n" + text);
+    })
+    .catch(() => {
+      alert("ไม่สามารถคัดลอกได้");
+    });
+}
+
 
 /* ========== PetIcon ========== */
 function createPetIcon(pet) {
