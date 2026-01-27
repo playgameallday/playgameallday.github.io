@@ -537,9 +537,9 @@ function toggleOtherAnimal(){
 
 /* ========== SAVE ========== */
 async function savePet(){
-  console.log("🔥 savePet called1");
+  //console.log("🔥 savePet called1");
   if(!clickLatLng) return;
-  console.log("🔥 savePet called2");
+  //console.log("🔥 savePet called2");
   const animalSel = document.getElementById('animal').value;
   const animal =
     animalSel === 'อื่นๆ(Other)'
@@ -620,7 +620,14 @@ async function loadPets(){
 const markers = {};
 function addMarker(pet) {
 
-  const icon = createPetIcon(pet);
+  ///const icon = createPetIcon(pet);
+  const images = Array.isArray(pet.image)
+    ? pet.image
+    : pet.image
+      ? [pet.image]
+      : [];
+
+  const icon = images[0] || "paw.png";
   
   const gallery = (pet.image || []).map(url => `
     <img
@@ -759,7 +766,7 @@ function copyLocation(lat, lng) {
 /* ========== PetIcon ========== */
 function createPetIcon(pet) {
   return L.icon({
-    iconUrl: 'paw.png' || 'paw.png',
+    iconUrl: pet.image?.[0] || 'paw.png',
     iconSize: [42, 42],
     iconAnchor: [21, 42],
     popupAnchor: [0, -42],
