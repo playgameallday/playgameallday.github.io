@@ -622,7 +622,7 @@ function addMarker(pet) {
 
   const icon = createPetIcon(pet);
   
-  const gallery = (pet.images || []).map(url => `
+  const gallery = (pet.image || []).map(url => `
     <img
       src="${url}"
       class="popup-thumb"
