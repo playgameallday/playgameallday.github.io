@@ -94,19 +94,66 @@
 /*----------------------------*/  
   
 /*----------------------------*/
-  .pet-marker {
-	border-radius: 50%;
-	border: 3px solid;
-	background: #fff;
-  }
+.pet-marker {
+  position: relative;
+  width: 46px;
+  height: 46px;
+}
 
-  .pet-marker.ตามหา-Lost {
-	border-color: #ff4d4f; /* แดง */
-  }
+/* ป้ายวัน */
+.pet-marker .day-label {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
 
-  .pet-marker.พบ-Found {
-	border-color: #2ecc71; /* เขียว */
-  }
+  background: #e53935;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+
+/* วงรูป */
+.pet-avatar {
+  width: 46px;
+  height: 46px;
+
+  border-radius: 50%;
+  overflow: hidden;        /* ⭐ ตัดเฉพาะรูป */
+  background: white;
+  border: 3px solid #4caf50;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pet-marker.ตามหา-Lost .pet-avatar {
+  border-color: #e53935;
+}
+.pet-marker.พบ-Found .pet-avatar {
+  border-color: #4caf50;
+}
+.pet-marker.ตามหา-Lost .day-label {
+  background: #e53935;
+}
+.pet-marker.พบ-Found .day-label {
+  background: #4caf50;
+}
+
+.pet-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
 /*----------------------------*/
 
 /*-- Popup Pet Informaiom --*/
@@ -821,6 +868,7 @@ function copyLocation(lat, lng) {
 
 
 /* ========== PetIcon ========== */
+/*
 function createPetIcon(pet,image) {
   return L.icon({
     //iconUrl: pet.image?.[0] || pet.image || "paw.png",
@@ -830,6 +878,39 @@ function createPetIcon(pet,image) {
     popupAnchor: [0, -42],
     className: `pet-marker ${pet.type}` // lost / found
   });
+}
+*/
+function createPetIcon(pet, imageUrl) {
+  const days = daysFromDate(pet.date);
+  const label = days === 0 ? "วันนี้" : `${days} วัน`;
+
+  const html = `
+    <div class="pet-marker ${pet.type}">
+      <div class="day-label">${label}</div>
+      <div class="pet-avatar">
+        <img src="${imageUrl || 'paw.png'}">
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    html,
+    className: "",
+    iconSize: [46, 46],
+    iconAnchor: [23, 46],
+    popupAnchor: [0, -42],
+  });
+}
+
+
+function daysFromDate(dateStr) {
+  const created = new Date(dateStr);
+  const now = new Date();
+
+  created.setHours(0,0,0,0);
+  now.setHours(0,0,0,0);
+
+  return Math.floor((now - created) / (1000 * 60 * 60 * 24));
 }
 
 function openImage(url) {
