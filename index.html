@@ -815,6 +815,13 @@ function normalizeImages(image) {
   return [];
 }
 
+function extractStoragePath(url) {
+  const marker = "/storage/v1/object/public/pets/";
+  const index = url.indexOf(marker);
+  if (index === -1) return null;
+  return url.substring(index + marker.length);
+}
+
 /* ========== deletePet ========== */
 /*
 async function deletePet(petId) {
@@ -881,13 +888,16 @@ async function deletePet(petId) {
 
   // 2. normalize รูปให้เป็น array
   const images = normalizeImages(pet.image);
+  const paths = images
+  .map(img => extractStoragePath(img))
+  .filter(Boolean);
 
   // 3. ลบรูปจาก Storage
-  if (images.length > 0) {
+  if (paths.length > 0) {
     const { error: storageError } = await supabaseClient
       .storage
       .from("pets") // ← ชื่อ bucket
-      .remove(images);
+      .remove(paths);
 
     if (storageError) {
       alert("ลบรูปไม่สำเร็จ");
