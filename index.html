@@ -296,6 +296,21 @@ button {
   object-fit: cover;
 }
   
+.day-filter-control {
+  margin-bottom: 70px; /* ดันขึ้นเหนือปุ่ม location */
+}
+
+.day-filter-control select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+  
+  
+  
 </style>
 </head>
 
@@ -435,7 +450,7 @@ async function uploadImages(files, userId) {
 
   return urls;
 }
-
+const DEFAULT_DAYS = 7;
 /* ========== User Location ========== */
 function locateUser() {
   if (!navigator.geolocation) {
@@ -449,7 +464,11 @@ function locateUser() {
       const lng = pos.coords.longitude;
 
       map.setView([lat, lng], 17);
-
+      
+	  map.whenReady(() => {
+	  loadPets(DEFAULT_DAYS);
+	  });
+	  
       // ลบ marker เก่า (ถ้ามี)
       if (window.myLocationMarker) {
         map.removeLayer(window.myLocationMarker);
@@ -608,6 +627,7 @@ function toggleOtherAnimal(){
   document.getElementById('otherAnimalField').style.display =
     v === 'อื่นๆ(Other)' ? 'block' : 'none';
 }
+let petAmoung = DEFAULT_DAYS;
 
 /* ========== SAVE ========== */
 async function savePet(){
@@ -679,33 +699,93 @@ async function savePet(){
 
   addMarker(pet);
   closeModal();
-  loadPets();
+  loadPets(petAmoung);
 }
+
+const dayFilterControl = L.control({ position: "bottomright" });
+
+dayFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "day-filter-control");
+
+  div.innerHTML = `
+    <select id="dayfilter">     
+      <option value="1">1 วัน</option>
+      <option value="3">3 วัน</option>
+      <option value="7" selected>7 วัน</option>
+      <option value="15">15 วัน</option>
+      <option value="30">1 เดือน</option>
+      <option value="90">3 เดือน</option>
+      <option value="180">6 เดือน</option>
+      <option value="365">1 ปี</option>
+      <option value="730">2 ปี</option>
+	  <option value="">ทั้งหมด</option>
+    </select>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+dayFilterControl.addTo(map);
+
+document.addEventListener("change", (e) => {
+  if (e.target.id === "dayfilter") {
+    const days = e.target.value;
+    loadPets(days ? Number(days) : null);
+  }
+});
+
 
 /* ========== LOAD PET========== */
 let loginUser = null;
 
-async function loadPets(){
-
+async function loadPets(maxDays = null) {
+  petAmoung = maxDays;
+  clearMarkers(); // ⭐ สำคัญมาก
   const {
   data: { user }
   } = await supabaseClient.auth.getUser()
   loginUser = user;
-
+  
   const { data, error } = await supabaseClient
     .from("pets")
     .select("*");
 
-  if(error){
+  if (error) {
     console.error(error);
     return;
   }
 
-  data.forEach(addMarker);
+  data.forEach(pet => {
+    if (maxDays !== null) {
+      if (!isWithinDays(pet.date, maxDays)) return;
+    }
+    addMarker(pet);
+  });
 }
 
+function isWithinDays(dateStr, days) {
+  const petDate = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor(
+    (now - petDate) / (1000 * 60 * 60 * 24)
+  );
+  return diffDays <= days;
+}
 
-const markers = {};
+//const markers = {};
+let markers = {};
+
+function clearMarkers() {
+  Object.values(markers).forEach(marker => {
+    map.removeLayer(marker);
+  });
+  markers = {};
+}
+
 function addMarker(pet) {
 
   const images = normalizeImages(pet.image);
@@ -824,40 +904,8 @@ function extractStoragePath(url) {
 }
 
 /* ========== deletePet ========== */
-/*
-async function deletePet(petId) {
-  if (!petId) {
-    alert("ไม่พบ ID หมุด");
-    return;
-  }
-  
-  // 🔥 ถามยืนยันก่อนลบ
-  const ok = confirm("ต้องการลบหมุดนี้จริงหรือไม่?\nการลบไม่สามารถกู้คืนได้");
 
-  if (!ok) return; // ผู้ใช้กดยกเลิก
-  
-  const { error } = await supabaseClient
-    .from('pets')
-    .delete()
-    .eq('id', petId)
 
-  if (error) {
-    alert('ลบไม่ได้: ' + error.message);
-	location.reload();
-	return;
-  } else {
-    loadPets();
-    alert('ลบเรียบร้อย');
-  }
-
-  
-  if (markers[petId]) {
-    map.removeLayer(markers[petId]);
-    delete markers[petId];
-  }
-  
-}
-*/
 async function deletePet(petId) {
 
   if (!petId) {
@@ -924,7 +972,7 @@ async function deletePet(petId) {
 	location.reload();
 	return;
   } else {
-    loadPets();
+    loadPets(petAmoung);
     alert('ลบเรียบร้อย');
   }
 
@@ -1097,7 +1145,7 @@ userPets.forEach((pet, index) => {
 }
 }
 
-loadPets();
+loadPets(petAmoung);
 </script>
 
 
