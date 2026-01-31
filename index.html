@@ -133,16 +133,16 @@
   justify-content: center;
 }
 
-.pet-marker.ตามหา-Lost .pet-avatar {
+.pet-marker.ตามหาสัตว์ .pet-avatar {
   border-color: #e53935;
 }
-.pet-marker.พบ-Found .pet-avatar {
+.pet-marker.ตามหาเจ้าของ .pet-avatar {
   border-color: #4caf50;
 }
-.pet-marker.ตามหา-Lost .day-label {
+.pet-marker.ตามหาสัตว์ .day-label {
   background: #e53935;
 }
-.pet-marker.พบ-Found .day-label {
+.pet-marker.ตามหาเจ้าของ .day-label {
   background: #4caf50;
 }
 
@@ -370,8 +370,8 @@ button {
     <div class="field">
       <label>สถานะ</label>
       <select id="type">
-        <option value="ตามหา-Lost">ตามหา</option>
-        <option value="พบ-Found">พบ</option>
+        <option value="ตามหาสัตว์">ตามหา</option>
+        <option value="ตามหาเจ้าของ">พบ</option>
       </select>
     </div>
 
@@ -785,8 +785,8 @@ typeFilterControl.onAdd = function () {
   div.innerHTML = `
     <select id="typefilter">     
       <option value="" selected>ทั้งหมด</option>
-      <option value="ตามหา-Lost">ตามหา</option>
-	  <option value="พบ-Found">พบ</option>
+      <option value="ตามหาสัตว์">ตามหา</option>
+	  <option value="ตามหาเจ้าของ">พบ</option>
     </select>
   `;
 
@@ -890,8 +890,8 @@ async function loadPets(maxDays = null, petType = null) {
     addMarker(pet);
 
     // ⭐ นับตามสถานะ
-    if (pet.type === "ตามหา-Lost")lost++;
-    if (pet.type === "พบ-Found") found++;
+    if (pet.type === "ตามหาสัตว์")lost++;
+    if (pet.type === "ตามหาเจ้าของ") found++;
   });
   
   // อัปเดตตัวเลข
