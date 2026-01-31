@@ -296,6 +296,7 @@ button {
   object-fit: cover;
 }
   
+  
 .day-filter-control {
   margin-bottom: 70px; /* ดันขึ้นเหนือปุ่ม location */
 }
@@ -310,6 +311,50 @@ button {
 }
   
   
+.pettype-filter-control {
+  margin-bottom: 70px; /* ดันขึ้นเหนือปุ่ม location */
+}
+
+.pettype-filter-control select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}  
+  
+  
+.pet-counter {
+  text-align: center;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.pet-counter .titlelost {
+  font-size: 16px;
+  font-weight: bold;
+  color: #e53935;
+}
+.pet-counter .titlefound {
+  font-size: 16px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.pet-counter .countlost {
+  font-size: 14px;
+  color: #e53935;
+}
+
+.pet-counter .countfound {
+  font-size: 14px;
+  color: #4caf50;
+}
+
   
 </style>
 </head>
@@ -627,7 +672,7 @@ function toggleOtherAnimal(){
   document.getElementById('otherAnimalField').style.display =
     v === 'อื่นๆ(Other)' ? 'block' : 'none';
 }
-let petAmoung = DEFAULT_DAYS;
+//let petAmoung = DEFAULT_DAYS;
 
 /* ========== SAVE ========== */
 async function savePet(){
@@ -699,7 +744,7 @@ async function savePet(){
 
   addMarker(pet);
   closeModal();
-  loadPets(petAmoung);
+  loadPets(DEFAULT_DAYS);
 }
 
 const dayFilterControl = L.control({ position: "bottomright" });
@@ -731,25 +776,100 @@ dayFilterControl.onAdd = function () {
 
 dayFilterControl.addTo(map);
 
-document.addEventListener("change", (e) => {
+
+const typeFilterControl = L.control({ position: "bottomright" });
+
+typeFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "pettype-filter-control");
+
+  div.innerHTML = `
+    <select id="typefilter">     
+      <option value="" selected>ทั้งหมด</option>
+      <option value="ตามหา-Lost">ตามหา</option>
+	  <option value="พบ-Found">พบ</option>
+    </select>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+typeFilterControl.addTo(map);
+
+const displayFilterControl = L.control({ position: "bottomright" });
+displayFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "display-filter-control");
+
+  div.innerHTML = `
+    <div class="pet-counter">
+      <div class="titlelost">ตามหาสัตว์</div>
+      <div class="countlost">
+        <span id="petlostCount">0</span> ตัว
+      </div>
+	  <div class="titlefound">ตามหาเจ้าของ</div>
+      <div class="countfound">
+        <span id="petfoundCount">0</span> ตัว
+      </div>
+	  
+    </div>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+displayFilterControl.addTo(map);
+
+
+
+/*document.addEventListener("change", (e) => {
   if (e.target.id === "dayfilter") {
     const days = e.target.value;
     loadPets(days ? Number(days) : null);
   }
 });
 
+document.addEventListener("change", (e) => {
+  if (e.target.id === "dayfilter" || e.target.id === "typefilter") {
+    const days = e.target.value;
+	const pettype = e.target.value;
+    loadPets(days ? Number(days) : null, pettype ? pettype : null);
+  }
+});
+*/
+document.addEventListener("change", () => {
+  const dayValue = document.getElementById("dayfilter").value;
+  const typeValue = document.getElementById("typefilter").value;
+
+  const days = dayValue ? Number(dayValue) : null;
+  const pettype = typeValue || null;
+
+  loadPets(days, pettype);
+});
+
+
 
 /* ========== LOAD PET========== */
 let loginUser = null;
 
-async function loadPets(maxDays = null) {
-  petAmoung = maxDays;
-  clearMarkers(); // ⭐ สำคัญมาก
+async function loadPets(maxDays = null, petType = null) {
+
+  clearMarkers(); // ⭐ ลบหมุดเก่าก่อนทุกครั้ง
+
+  let lost = 0; // ⭐ ตัวนับหมุด
+  let found = 0; // ⭐ ตัวนับหมุด
+
   const {
-  data: { user }
-  } = await supabaseClient.auth.getUser()
+    data: { user }
+  } = await supabaseClient.auth.getUser();
   loginUser = user;
-  
+
   const { data, error } = await supabaseClient
     .from("pets")
     .select("*");
@@ -760,12 +880,26 @@ async function loadPets(maxDays = null) {
   }
 
   data.forEach(pet => {
-    if (maxDays !== null) {
-      if (!isWithinDays(pet.date, maxDays)) return;
-    }
+
+     // filter วัน
+    if (maxDays !== null && !isWithinDays(pet.date, maxDays)) return;
+
+    // filter ชนิดสัตว์
+    if (petType !== null && pet.type !== petType) return;
+
     addMarker(pet);
+
+    // ⭐ นับตามสถานะ
+    if (pet.type === "ตามหา-Lost")lost++;
+    if (pet.type === "พบ-Found") found++;
   });
+  
+  // อัปเดตตัวเลข
+  document.getElementById("petlostCount").textContent = lost;
+  document.getElementById("petfoundCount").textContent = found;
+  
 }
+
 
 function isWithinDays(dateStr, days) {
   const petDate = new Date(dateStr);
@@ -972,7 +1106,7 @@ async function deletePet(petId) {
 	location.reload();
 	return;
   } else {
-    loadPets(petAmoung);
+    loadPets(DEFAULT_DAYS);
     alert('ลบเรียบร้อย');
   }
 
@@ -1145,7 +1279,7 @@ userPets.forEach((pet, index) => {
 }
 }
 
-loadPets(petAmoung);
+loadPets(DEFAULT_DAYS);
 </script>
 
 
