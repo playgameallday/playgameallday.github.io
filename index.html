@@ -663,7 +663,7 @@ async function savePet(){
     image: imageUrl,       // รูป URL
     lat: clickLatLng.lat,
     lng: clickLatLng.lng,
-	user_name: currentUser.email,
+	//user_name: currentUser.email,
 	user_id: currentUser.id
   };
 
@@ -816,6 +816,7 @@ function normalizeImages(image) {
 }
 
 /* ========== deletePet ========== */
+/*
 async function deletePet(petId) {
   if (!petId) {
     alert("ไม่พบ ID หมุด");
@@ -847,6 +848,82 @@ async function deletePet(petId) {
     delete markers[petId];
   }
   
+}
+*/
+async function deletePet(petId) {
+
+  if (!petId) {
+    alert("ไม่พบ ID หมุด");
+    return;
+  }
+  
+  // 🔥 ถามยืนยันก่อนลบ
+  const ok = confirm("ต้องการลบหมุดนี้จริงหรือไม่?\nการลบไม่สามารถกู้คืนได้");
+
+  if (!ok) return; // ผู้ใช้กดยกเลิก
+  
+  //if (!confirm("ยืนยันลบหมุดนี้และรูปทั้งหมด?")) return;
+  
+  
+
+  // 1. ดึงข้อมูลหมุดก่อน (เพื่อรู้ path รูป)
+  const { data: pet, error: fetchError } = await supabaseClient
+    .from("pets")
+    .select("image")
+    .eq("id", petId)
+    .single();
+
+  if (fetchError) {
+    alert("ดึงข้อมูลรูปไม่สำเร็จ");
+    console.error(fetchError);
+    return;
+  }
+
+  // 2. normalize รูปให้เป็น array
+  const images = normalizeImages(pet.image);
+
+  // 3. ลบรูปจาก Storage
+  if (images.length > 0) {
+    const { error: storageError } = await supabaseClient
+      .storage
+      .from("pets") // ← ชื่อ bucket
+      .remove(images);
+
+    if (storageError) {
+      alert("ลบรูปไม่สำเร็จ");
+      console.error(storageError);
+      return;
+    }
+  }
+
+  // 4. ลบแถวใน DB
+  const { error: deleteError } = await supabaseClient
+    .from("pets")
+    .delete()
+    .eq("id", petId);
+/*
+  if (deleteError) {
+    alert("ลบหมุดไม่สำเร็จ");
+    console.error(deleteError);
+    return;
+  }
+*/  
+  if (deleteError) {
+    alert('ลบไม่ได้: ' + error.message);
+	location.reload();
+	return;
+  } else {
+    loadPets();
+    alert('ลบเรียบร้อย');
+  }
+
+  //alert("ลบหมุดและรูปเรียบร้อย");
+
+  // 5. ลบ marker ออกจากแผนที่
+  if (markers[petId]) {
+    map.removeLayer(markers[petId]);
+    delete markers[petId];
+  }
 }
 
 /* ========== closePopup ========== */
