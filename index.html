@@ -762,15 +762,16 @@ function addMarker(pet) {
   }
 
   popupHtml += `
-        <button class="close-btn" onclick="closePopup()">
-          ✖ ปิด
-        </button>
-		
+        
 		<button class="copy-btn"
           onclick="copyLocation(${pet.lat}, ${pet.lng})">
           📋 คัดลอกตำแหน่ง
         </button>
 		
+		<button class="close-btn" onclick="closePopup()">
+          ✖ ปิด
+        </button>
+			
       </div>
     </div>
   `;
