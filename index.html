@@ -586,6 +586,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     userBox.style.display = "none";
   }
   //console.log("currentUser1:",currentUser);
+  console.log("create1:");
   userPets = []; 
   Createshortcut(currentUser);
 });
@@ -835,6 +836,7 @@ async function savePet(){
 
   loadPets(days, pettype);
   userPets = [];
+  console.log("create2:");
   Createshortcut(currentUser);
 }
 
@@ -1129,6 +1131,7 @@ async function deletePet(petId) {
 
     loadPets(days, pettype);
 	userPets = [];
+	console.log("create3:");
     Createshortcut(currentUser); 
     //loadPets(DEFAULT_DAYS);
     alert('ลบเรียบร้อย');
@@ -1312,6 +1315,7 @@ userPets.forEach((pet, index) => {
 
   loadPets(days, pettype);
   userPets = [];
+  console.log("create4:");
   Createshortcut(currentUser);
   //loadPets(DEFAULT_DAYS);
 </script>
