@@ -858,8 +858,8 @@ async function savePet(){
     animalSel === 'อื่นๆ'
       ? document.getElementById('otherAnimal').value
       : animalSel;
-  console.log("animalSel", animalSel);
-  console.log("animal", animal);
+  //console.log("animalSel", animalSel);
+  //console.log("animal", animal);
     const { data: { user } } =
       await supabaseClient.auth.getUser();
 
