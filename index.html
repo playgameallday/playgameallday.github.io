@@ -855,7 +855,7 @@ async function savePet(){
   
   const animalSel = document.getElementById('animal').value;
   const animal =
-    animalSel === 'อื่นๆ(Other)'
+    animalSel === 'อื่นๆ'
       ? document.getElementById('otherAnimal').value
       : animalSel;
 
@@ -1003,15 +1003,15 @@ async function loadPets(maxDays = null, petType = null, animalV= null) {
 	}
 
 	// แสดงที่ไม่ใช่หมาและแมว
-	//else if (animalV === "อื่นๆ") {
-	//  if (pet.animal === "สุนัข" || pet.animal === "แมว") return;
-	//}
+	else if (animalV === "อื่นๆ") {
+	  if (pet.animal === "สุนัข" || pet.animal === "แมว") return;
+	}
 	
-	// แสดงที่ไม่ใช่หมาและแมว
+/*	// แสดงที่ไม่ใช่หมาและแมว
 	else {
 	  if (pet.animal === "สุนัข" || pet.animal === "แมว") return;
 	}
-
+*/
     addMarker(pet);
 
     // ⭐ นับตามสถานะ
