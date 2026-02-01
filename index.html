@@ -359,7 +359,8 @@ button {
 .welcome-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(245,245,245,0.8);
+  
   z-index: 99999; /* ต้องมากกว่า Leaflet */
   display: flex;
   align-items: center;
@@ -380,7 +381,13 @@ button {
 .welcome-box button {
   margin-top: 12px;
   padding: 6px 16px;
-  font-size: 16px;
+  font-size: 26px;
+  color: #fff;
+  background: #808080;
+}
+
+.welcome-box button:hover {
+  background: #D3D3D3;
 }
   
   
