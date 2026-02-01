@@ -1003,7 +1003,12 @@ async function loadPets(maxDays = null, petType = null, animalV= null) {
 	}
 
 	// แสดงที่ไม่ใช่หมาและแมว
-	else if (animalV === "อื่นๆ") {
+	//else if (animalV === "อื่นๆ") {
+	//  if (pet.animal === "สุนัข" || pet.animal === "แมว") return;
+	//}
+	
+	// แสดงที่ไม่ใช่หมาและแมว
+	else {
 	  if (pet.animal === "สุนัข" || pet.animal === "แมว") return;
 	}
 
