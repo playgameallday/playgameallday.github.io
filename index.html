@@ -422,9 +422,9 @@ button {
     <div class="field">
       <label>สัตว์</label>
       <select id="animal" onchange="toggleOtherAnimal()">
-        <option value="สุนัข(Dog)">สุนัข</option>
-        <option value="แมว(Cat)">แมว</option>
-        <option value="อื่นๆ(Other)">อื่นๆ</option>
+        <option value="สุนัข">สุนัข</option>
+        <option value="แมว">แมว</option>
+        <option value="อื่นๆ">อื่นๆ</option>
       </select>
     </div>
 
@@ -564,7 +564,7 @@ function locateUser() {
       map.setView([lat, lng], 17);
       
 	  map.whenReady(() => {
-	  loadPets(DEFAULT_DAYS,"");
+	  loadPets(DEFAULT_DAYS,"","");
 	  });
 	  
       // ลบ marker เก่า (ถ้ามี)
@@ -687,7 +687,7 @@ map.on('click', e => {
 });
 /* ==================== */
 
-
+//////////ADD find location BTN/////////////
 const locateControl = L.control({ position: "bottomright" });
 
 locateControl.onAdd = () => {
@@ -712,6 +712,7 @@ locateControl.onAdd = () => {
 
 locateControl.addTo(map);
 
+//////////ADD day filter BTN/////////////
 const dayFilterControl = L.control({ position: "bottomright" });
 
 dayFilterControl.onAdd = function () {
@@ -741,7 +742,31 @@ dayFilterControl.onAdd = function () {
 
 dayFilterControl.addTo(map);
 
+//////////ADD animal filter BTN/////////////
+const animalFilterControl = L.control({ position: "bottomright" });
 
+animalFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "animal-filter-control");
+
+  div.innerHTML = `
+    <select id="animalfilter">     
+      <option value="" selected>ทั้งหมด</option>
+      <option value="สุนัข">สุนัข</option>
+	  <option value="แมว">แมว</option>
+	  <option value="อื่นๆ">อื่นๆ</option>
+    </select>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+animalFilterControl.addTo(map);
+
+//////////ADD type filter BTN/////////////
 const typeFilterControl = L.control({ position: "bottomright" });
 
 typeFilterControl.onAdd = function () {
@@ -764,7 +789,10 @@ typeFilterControl.onAdd = function () {
 
 typeFilterControl.addTo(map);
 
+
+//////////ADD Count pin/////////////
 const displayFilterControl = L.control({ position: "bottomright" });
+
 displayFilterControl.onAdd = function () {
   const div = L.DomUtil.create("div", "display-filter-control");
 
@@ -879,11 +907,13 @@ async function savePet(){
   //loadPets(DEFAULT_DAYS);
   const dayValue = document.getElementById("dayfilter").value;
   const typeValue = document.getElementById("typefilter").value;
+  const animalValue = document.getElementById("animalfilter").value;
 
   const days = dayValue ? Number(dayValue) : null;
   const pettype = typeValue || null;
+  const animalV = animalValue || null;
 
-  loadPets(days, pettype);
+  loadPets(days, pettype, animalV);
   Createshortcut(currentUser);
 }
 
@@ -909,11 +939,13 @@ document.addEventListener("change", (e) => {
 document.addEventListener("change", () => {
   const dayValue = document.getElementById("dayfilter").value;
   const typeValue = document.getElementById("typefilter").value;
+  const animalValue = document.getElementById("animalfilter").value;
 
   const days = dayValue ? Number(dayValue) : null;
   const pettype = typeValue || null;
+  const animalV = animalValue || null;
 
-  loadPets(days, pettype);
+  loadPets(days, pettype, animalV);
 });
 
 
@@ -921,8 +953,10 @@ document.addEventListener("change", () => {
 /* ========== LOAD PET========== */
 let loginUser = null;
 
-async function loadPets(maxDays = null, petType = null) {
-
+async function loadPets(maxDays = null, petType = null, animalV= null) {
+  console.log("maxDays", maxDays);
+  console.log("petType", petType);
+  console.log("animal", animalV);
   clearMarkers(); // ⭐ ลบหมุดเก่าก่อนทุกครั้ง
 
   let lost = 0; // ⭐ ตัวนับหมุด
@@ -947,8 +981,31 @@ async function loadPets(maxDays = null, petType = null) {
      // filter วัน
     if (maxDays !== null && !isWithinDays(pet.date, maxDays)) return;
 
-    // filter ชนิดสัตว์
+    // filter lost/found
     if (petType !== null && pet.type !== petType) return;
+/*	
+	// filter ชนิดสัตว์ หมา แมว
+	if (animalV !== null && pet.animal !== animalV) return;
+	
+	// filter ชนิดสัตว์ อื่นๆ
+	if (animalV == "อื่นๆ" && (pet.animal == "สุนัข" || pet.animal == "แมว")) return;
+    //console.log("pet.animal", pet.animal);
+	
+*/
+    // แสดงทั้งหมด
+	if (!animalV) {
+	// ไม่ต้อง return ปล่อยผ่าน
+	}
+
+	// แสดงเฉพาะสุนัข หรือ แมว
+	else if (animalV === "สุนัข" || animalV === "แมว") {
+	  if (pet.animal !== animalV) return;
+	}
+
+	// แสดงที่ไม่ใช่หมาและแมว
+	else if (animalV === "อื่นๆ") {
+	  if (pet.animal === "สุนัข" || pet.animal === "แมว") return;
+	}
 
     addMarker(pet);
 
@@ -1172,11 +1229,13 @@ async function deletePet(petId) {
   
     const dayValue = document.getElementById("dayfilter").value;
     const typeValue = document.getElementById("typefilter").value;
+    const animalValue = document.getElementById("animalfilter").value;
 
     const days = dayValue ? Number(dayValue) : null;
     const pettype = typeValue || null;
+    const animalV = animalValue || null;
 
-    loadPets(days, pettype);
+    loadPets(days, pettype, animalV);
     Createshortcut(currentUser); 
     //loadPets(DEFAULT_DAYS);
     alert('ลบเรียบร้อย');
@@ -1353,11 +1412,13 @@ userPets.forEach((pet, index) => {
 }
   const dayValue = document.getElementById("dayfilter").value;
   const typeValue = document.getElementById("typefilter").value;
+  const animalValue = document.getElementById("animalfilter").value;
 
   const days = dayValue ? Number(dayValue) : null;
   const pettype = typeValue || null;
+  const animalV = animalValue || null;
 
-  loadPets(days, pettype);
+  loadPets(days, pettype, animalV);
   Createshortcut(currentUser);
   //loadPets(DEFAULT_DAYS);
 </script>
