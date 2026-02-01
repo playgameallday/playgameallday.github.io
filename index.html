@@ -561,7 +561,6 @@ async function loginGoogle() {
 }
 
 let currentUser = null;
-let userPets = [];     // เก็บข้อมูลจาก DB
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
@@ -585,9 +584,7 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
     loginBtn.style.display = "inline-block";
     userBox.style.display = "none";
   }
-  //console.log("currentUser1:",currentUser);
-  console.log("create1:");
-  userPets = []; 
+  //console.log("currentUser1:",currentUser); 
   Createshortcut(currentUser);
 });
 
@@ -835,8 +832,6 @@ async function savePet(){
   const pettype = typeValue || null;
 
   loadPets(days, pettype);
-  userPets = [];
-  console.log("create2:");
   Createshortcut(currentUser);
 }
 
@@ -1130,8 +1125,6 @@ async function deletePet(petId) {
     const pettype = typeValue || null;
 
     loadPets(days, pettype);
-	userPets = [];
-	console.log("create3:");
     Createshortcut(currentUser); 
     //loadPets(DEFAULT_DAYS);
     alert('ลบเรียบร้อย');
@@ -1257,7 +1250,7 @@ if (error) {
 }
 
 //const userMarkers = [];   // เก็บ marker leaflet
-
+const userPets = [];     // เก็บข้อมูลจาก DB
 
 
 pets.forEach((pet) => {
@@ -1272,9 +1265,7 @@ pets.forEach((pet) => {
   ).addTo(map);
 
   userMarkers.push(marker);*/
-  //userPets.push(pet);
-  userPets = pet || [];
-  console.log("1:",pet.id);
+  userPets.push(pet);
 });
 
 
@@ -1315,8 +1306,6 @@ userPets.forEach((pet, index) => {
   const pettype = typeValue || null;
 
   loadPets(days, pettype);
-  userPets = [];
-  console.log("create4:");
   Createshortcut(currentUser);
   //loadPets(DEFAULT_DAYS);
 </script>
