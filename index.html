@@ -496,6 +496,7 @@ async function uploadImages(files, userId) {
   return urls;
 }
 const DEFAULT_DAYS = 7;
+
 /* ========== User Location ========== */
 function locateUser() {
   if (!navigator.geolocation) {
@@ -511,7 +512,7 @@ function locateUser() {
       map.setView([lat, lng], 17);
       
 	  map.whenReady(() => {
-	  loadPets(DEFAULT_DAYS);
+	  loadPets(DEFAULT_DAYS,null);
 	  });
 	  
       // ลบ marker เก่า (ถ้ามี)
@@ -560,6 +561,7 @@ async function loginGoogle() {
 }
 
 let currentUser = null;
+let userPets = [];     // เก็บข้อมูลจาก DB
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
@@ -659,6 +661,85 @@ locateControl.onAdd = () => {
 
 locateControl.addTo(map);
 
+const dayFilterControl = L.control({ position: "bottomright" });
+
+dayFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "day-filter-control");
+
+  div.innerHTML = `
+    <select id="dayfilter">     
+      <option value="1">1 วัน</option>
+      <option value="3">3 วัน</option>
+      <option value="7" selected>7 วัน</option>
+      <option value="15">15 วัน</option>
+      <option value="30">1 เดือน</option>
+      <option value="90">3 เดือน</option>
+      <option value="180">6 เดือน</option>
+      <option value="365">1 ปี</option>
+      <option value="730">2 ปี</option>
+	  <option value="">ทั้งหมด</option>
+    </select>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+dayFilterControl.addTo(map);
+
+
+const typeFilterControl = L.control({ position: "bottomright" });
+
+typeFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "pettype-filter-control");
+
+  div.innerHTML = `
+    <select id="typefilter">     
+      <option value="" selected>ทั้งหมด</option>
+      <option value="ตามหาสัตว์">ตามหาสัตว์</option>
+	  <option value="ตามหาเจ้าของ">ตามหาเจ้าของ</option>
+    </select>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+typeFilterControl.addTo(map);
+
+const displayFilterControl = L.control({ position: "bottomright" });
+displayFilterControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "display-filter-control");
+
+  div.innerHTML = `
+    <div class="pet-counter">
+      <div class="titlelost">ตามหาสัตว์</div>
+      <div class="countlost">
+        <span id="petlostCount">0</span> ตัว
+      </div>
+	  <div class="titlefound">ตามหาเจ้าของ</div>
+      <div class="countfound">
+        <span id="petfoundCount">0</span> ตัว
+      </div>
+	  
+    </div>
+  `;
+
+  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+
+  return div;
+};
+
+displayFilterControl.addTo(map);
+
 
 /* ========== MODAL ========== */
 function openModal(){
@@ -744,87 +825,19 @@ async function savePet(){
 
   addMarker(pet);
   closeModal();
-  loadPets(DEFAULT_DAYS);
+  //loadPets(DEFAULT_DAYS);
+  const dayValue = document.getElementById("dayfilter").value;
+  const typeValue = document.getElementById("typefilter").value;
+
+  const days = dayValue ? Number(dayValue) : null;
+  const pettype = typeValue || null;
+
+  loadPets(days, pettype);
+  userPets = [];
+  Createshortcut(currentUser);
 }
 
-const dayFilterControl = L.control({ position: "bottomright" });
 
-dayFilterControl.onAdd = function () {
-  const div = L.DomUtil.create("div", "day-filter-control");
-
-  div.innerHTML = `
-    <select id="dayfilter">     
-      <option value="1">1 วัน</option>
-      <option value="3">3 วัน</option>
-      <option value="7" selected>7 วัน</option>
-      <option value="15">15 วัน</option>
-      <option value="30">1 เดือน</option>
-      <option value="90">3 เดือน</option>
-      <option value="180">6 เดือน</option>
-      <option value="365">1 ปี</option>
-      <option value="730">2 ปี</option>
-	  <option value="">ทั้งหมด</option>
-    </select>
-  `;
-
-  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
-  L.DomEvent.disableClickPropagation(div);
-  L.DomEvent.disableScrollPropagation(div);
-
-  return div;
-};
-
-dayFilterControl.addTo(map);
-
-
-const typeFilterControl = L.control({ position: "bottomright" });
-
-typeFilterControl.onAdd = function () {
-  const div = L.DomUtil.create("div", "pettype-filter-control");
-
-  div.innerHTML = `
-    <select id="typefilter">     
-      <option value="" selected>ทั้งหมด</option>
-      <option value="ตามหาสัตว์">ตามหาสัตว์</option>
-	  <option value="ตามหาเจ้าของ">ตามหาเจ้าของ</option>
-    </select>
-  `;
-
-  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
-  L.DomEvent.disableClickPropagation(div);
-  L.DomEvent.disableScrollPropagation(div);
-
-  return div;
-};
-
-typeFilterControl.addTo(map);
-
-const displayFilterControl = L.control({ position: "bottomright" });
-displayFilterControl.onAdd = function () {
-  const div = L.DomUtil.create("div", "display-filter-control");
-
-  div.innerHTML = `
-    <div class="pet-counter">
-      <div class="titlelost">ตามหาสัตว์</div>
-      <div class="countlost">
-        <span id="petlostCount">0</span> ตัว
-      </div>
-	  <div class="titlefound">ตามหาเจ้าของ</div>
-      <div class="countfound">
-        <span id="petfoundCount">0</span> ตัว
-      </div>
-	  
-    </div>
-  `;
-
-  // กัน map เลื่อนตอนแตะ dropdown (สำคัญมากบนมือถือ)
-  L.DomEvent.disableClickPropagation(div);
-  L.DomEvent.disableScrollPropagation(div);
-
-  return div;
-};
-
-displayFilterControl.addTo(map);
 
 
 
@@ -1106,7 +1119,17 @@ async function deletePet(petId) {
 	location.reload();
 	return;
   } else {
-    loadPets(DEFAULT_DAYS);
+  
+    const dayValue = document.getElementById("dayfilter").value;
+    const typeValue = document.getElementById("typefilter").value;
+
+    const days = dayValue ? Number(dayValue) : null;
+    const pettype = typeValue || null;
+
+    loadPets(days, pettype);
+	userPets = [];
+    Createshortcut(currentUser); 
+    //loadPets(DEFAULT_DAYS);
     alert('ลบเรียบร้อย');
   }
 
@@ -1230,7 +1253,7 @@ if (error) {
 }
 
 //const userMarkers = [];   // เก็บ marker leaflet
-const userPets = [];     // เก็บข้อมูลจาก DB
+
 
 
 pets.forEach((pet) => {
@@ -1278,8 +1301,16 @@ userPets.forEach((pet, index) => {
 
 }
 }
+  const dayValue = document.getElementById("dayfilter").value;
+  const typeValue = document.getElementById("typefilter").value;
 
-loadPets(DEFAULT_DAYS);
+  const days = dayValue ? Number(dayValue) : null;
+  const pettype = typeValue || null;
+
+  loadPets(days, pettype);
+  userPets = [];
+  Createshortcut(currentUser);
+  //loadPets(DEFAULT_DAYS);
 </script>
 
 
