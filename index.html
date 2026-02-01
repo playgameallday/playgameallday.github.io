@@ -512,7 +512,7 @@ function locateUser() {
       map.setView([lat, lng], 17);
       
 	  map.whenReady(() => {
-	  loadPets(DEFAULT_DAYS,null);
+	  loadPets(DEFAULT_DAYS,"");
 	  });
 	  
       // ลบ marker เก่า (ถ้ามี)
@@ -1293,7 +1293,7 @@ userPets.forEach((pet, index) => {
   };
 
   shortcut.appendChild(btn);
-  console.log("2:",pet.id);
+  //console.log("2:",pet.id);
 });
 
 
