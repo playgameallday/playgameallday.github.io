@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta property="og:title" content="ตามหาเจ้าโบ้ 🐶 หายบริเวณ..." />
+  <meta property="og:description" content="หายวันที่ 1 ก.พ. 2569 ใครพบเห็นโทร..." />
+  <meta property="og:image" content="https://playgameallday.github.io/greeting.png" />
+  <meta property="og:url" content="https://playgameallday.github.io" />
+  <meta property="og:type" content="website" />
+  
 <title>Find my Pet</title>
 
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -404,6 +411,41 @@ button {
 }
   
   
+.welcome2-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  
+  z-index: 99999; /* ต้องมากกว่า Leaflet */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome2-box {
+  text-align: center;
+}
+
+.welcome2-box img {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 12px;
+  display: block;
+}
+
+.welcome2-box button {
+  margin-top: 12px;
+  padding: 6px 16px;
+  font-size: 26px;
+  color: #fff;
+  background: #808080;
+}
+
+.welcome2-box button:hover {
+  background: #D3D3D3;
+}
+  
+  
 </style>
 </head>
 
@@ -415,6 +457,13 @@ button {
   <div class="welcome-box">
     <img src="greeting.png" alt="welcome">
     <button onclick="closeWelcome()">ปิด</button>
+  </div>
+</div>
+
+<div id="welcomeOverlay2" class="welcome2-overlay" style="display:none">
+  <div class="welcome2-box">
+    <img src="greeting2.png" alt="welcome2">
+    <button onclick="closeWelcome2()">ปิด</button>
   </div>
 </div>
 
@@ -502,10 +551,19 @@ button {
 <script>
 
 function closeWelcome() {
+  //close self
   document.getElementById("welcomeOverlay").style.display = "none";
+  //open welcomeOverlay2
+  document.getElementById("welcomeOverlay2").style.display = "flex";
+}
+
+function closeWelcome2() {
+  //close self
+  document.getElementById("welcomeOverlay2").style.display = "none";
 }
 
 window.addEventListener("load", () => {
+  //open welcomeOverlay
   document.getElementById("welcomeOverlay").style.display = "flex";
 });
 
