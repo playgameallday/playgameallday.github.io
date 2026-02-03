@@ -164,24 +164,32 @@
 /*----------------------------*/
 
 /*-- Popup Pet Informaiom --*/
-  .popup {
-    width: 300px;
-  }
 
-  .popup-img-wrap {
-    width: 20%;
-    height: 140px;        /* ปรับความสูงได้ */
-    overflow: hidden;    /* ⭐ สำคัญมาก */
-    border-radius: 12px;
-    margin-bottom: 6px;
-  }
+/* กรอบ popup */
+.leaflet-popup-content {
+  width: 400px !important;
+  max-width: 500px;
+}
 
-  .popup-img {
-    width: 20%;
-    height: 20%;
-    object-fit: cover;   /* ครอป ไม่ยืด */
-    display: block;
-  }
+/* wrapper รูป */
+.popup-img-wrap {
+  width: 100%;
+  max-height: 260px;      /* ⭐ กำหนดความสูงที่อยากได้ */
+  display: flex;          /* ⭐ จัดกลาง */
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;    /* เผื่อภาพแนวตั้ง */
+  border-radius: 12px;
+}
+
+/* ตัวรูป */
+.popup-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;    /* ⭐ สำคัญมาก */
+  display: block;
+}
+
 /*----------------------------*/
   
 /*-- login button --*/
