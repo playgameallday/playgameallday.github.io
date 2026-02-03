@@ -165,23 +165,30 @@
 
 /*-- Popup Pet Informaiom --*/
   .popup {
-    width: 300px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .popup-img-wrap {
     width: 100%;
-    height: 140px;        /* ปรับความสูงได้ */
-    overflow: hidden;    /* ⭐ สำคัญมาก */
-    border-radius: 12px;
-    margin-bottom: 6px;
+    height: auto;          /* ⭐ เปลี่ยนจาก fix height */
   }
 
   .popup-img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;   /* ครอป ไม่ยืด */
+    height: auto;          /* ⭐ ให้รูปดันกรอบ */
     display: block;
   }
+  
+.leaflet-popup-content-wrapper {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.leaflet-popup-content {
+  width: 400px !important; /* ⭐ ปรับความกว้างกรอบ popup */
+  max-width: 500px;
+}
 /*----------------------------*/
   
 /*-- login button --*/
@@ -259,6 +266,11 @@ button {
 }
   
 .copy-btn {
+  background: #999;
+  color: #fff;
+}  
+
+.copylink-btn {
   background: #999;
   color: #fff;
 }  
@@ -977,7 +989,7 @@ async function savePet(){
     return;
   }
   updatePetID();
-  addMarker(pet);
+  //addMarker(pet);
   closeModal();
   //loadPets(DEFAULT_DAYS);
   const dayValue = document.getElementById("dayfilter").value;
@@ -1177,6 +1189,11 @@ function addMarker(pet) {
 
   popupHtml += `
         
+		<button class="copylink-btn"
+          onclick="copylink(${pet.petID})">
+          📣 คัดลอกเพื่อแชร์
+        </button>
+		
 		<button class="copy-btn"
           onclick="copyLocation(${pet.lat}, ${pet.lng})">
           📋 คัดลอกตำแหน่ง
@@ -1346,6 +1363,19 @@ function copyLocation(lat, lng) {
       alert("ไม่สามารถคัดลอกได้");
     });
 }
+
+function copylink(petID) {
+  //const text = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+  const text = "https://playgameallday.github.io/index.html?animalID=" + petID;
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      alert("คัดลอกแล้ว:\n" + text);
+    })
+    .catch(() => {
+      alert("ไม่สามารถคัดลอกได้");
+    });
+}
+
 
 
 /* ========== PetIcon ========== */
