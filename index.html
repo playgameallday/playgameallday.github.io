@@ -1422,6 +1422,31 @@ function shortcutIcon(iconUrl) {
   });
 }
 
+async function flyToPet(){
+
+  const params = new URLSearchParams(window.location.search);
+
+  const animalID = params.get("animalID");
+
+  console.log(animalID); // dog
+
+  if (params.has("animalID")) {
+    console.log("มี animalID");
+	
+	const { data: pets, error } = await supabaseClient
+     .from("pets")
+     .select("lat, lng")
+     .eq("id", animalID);
+	 
+	map.flyTo(
+      [pets.lat, pets.lng],
+      17,
+      { animate: true, duration: 0.8 }
+    );
+  }
+
+}
+
 async function Createshortcut(currentUser) {
 //console.log("currentUser2:",currentUser);
 if (currentUser){
