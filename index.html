@@ -202,7 +202,7 @@
 }
 
 .leaflet-popup-content {
-  width: 300px !important; /* ⭐ ปรับความกว้างกรอบ popup */
+  width: 325px !important; /* ⭐ ปรับความกว้างกรอบ popup */
   max-width: 500px;
 }
 
@@ -290,12 +290,6 @@ button {
 .copylink-btn {
   background: #999;
   color: #fff;
-  
-  white-space: normal;   /* ⭐ ให้ตัดบรรทัดได้ */
-  line-height: 1.2;
-  
-  text-align: center;
-  padding: 8px 6px;
 }  
 
 .preview-container {
@@ -1180,8 +1174,8 @@ function addMarker(pet) {
       <div class="popup-info">
         <b>[${pet.type}]</b><br>
         PetID: ${pet.petID}<br>
+		สัตว์: ${pet.animal}<br>
         ชื่อ: ${pet.name}<br>
-        สัตว์: ${pet.animal}<br>
         สายพันธุ์: ${pet.breed}<br>
         สี: ${pet.color}<br>
         วันที่: ${pet.date}<br>
