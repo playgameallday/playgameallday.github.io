@@ -560,7 +560,7 @@ function closeWelcome() {
 function closeWelcome2() {
   //close self
   document.getElementById("welcomeOverlay2").style.display = "none";
-  flyToPet();
+  //flyToPet();
 }
 
 window.addEventListener("load", () => {
@@ -689,6 +689,8 @@ let currentUser = null;
 supabaseClient.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user || null;
   updateUI();
+  
+  flyToPet();
   
   const loginBtn = document.getElementById("loginBtn");
   const userBox = document.getElementById("userBox");
