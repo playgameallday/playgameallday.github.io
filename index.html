@@ -1439,7 +1439,7 @@ async function flyToPet(){
 	const { data: pets, error } = await supabaseClient
      .from("pets")
      .select("lat, lng")
-     .eq("id", animalID);
+     .eq("id", animalID)
 	 .single();
 	 
 	map.flyTo(
