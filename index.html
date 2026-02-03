@@ -1005,7 +1005,7 @@ async function savePet(){
     console.error(error);
     return;
   }
-  updatePetID();
+  await updatePetID();
   //addMarker(pet);
   closeModal();
   //loadPets(DEFAULT_DAYS);
