@@ -976,7 +976,7 @@ async function savePet(){
     console.error(error);
     return;
   }
-
+  updatePetID();
   addMarker(pet);
   closeModal();
   //loadPets(DEFAULT_DAYS);
@@ -1425,16 +1425,77 @@ function shortcutIcon(iconUrl) {
   });
 }
 
+/*
+async function updatePetID(){
+  const { data: pets, error } = await supabaseClient
+	 .from("pets")
+     .select("id")
+     .eq("user_id", currentUser.id)
+     .is("petID", null);
+	 .single();
+	 
+  const newID = pets.id;
+  
+  if (!currentUser) return;
+
+  const { data, error } = await supabaseClient
+    .from("pets")
+    .update({ petID: newID })
+    .eq("user_id", currentUser.id)
+    .eq("id", newID);
+
+  if (error) {
+    console.error("อัปเดต petID ไม่สำเร็จ:", error);
+    return;
+  }
+
+  console.log("อัปเดต petID สำเร็จ:", data);
+
+}*/
+async function updatePetID() {
+  if (!currentUser) return;
+
+  // 1️⃣ หาแถวที่ petID เป็น null (เอาแถวล่าสุด)
+  const { data: pet, error: fetchError } = await supabaseClient
+    .from("pets")
+    .select("id")
+    .eq("user_id", currentUser.id)
+    .is("petID", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (fetchError || !pet) {
+    console.log("ไม่พบ petID ที่เป็น null");
+    return;
+  }
+
+  // 2️⃣ update petID = id
+  const { error: updateError } = await supabaseClient
+    .from("pets")
+    .update({ petID: pet.id })
+    .eq("id", pet.id);
+
+  if (updateError) {
+    console.error("อัปเดต petID ไม่สำเร็จ:", updateError);
+    return;
+  }
+
+  console.log("อัปเดต petID สำเร็จ:", pet.id);
+}
+
+
+
 async function flyToPet(){
 
   const params = new URLSearchParams(window.location.search);
 
   const animalID = params.get("animalID");
 
-  console.log(animalID); // dog
+  //console.log(animalID); // dog
 
   if (params.has("animalID")) {
-    console.log("มี animalID");
+    //console.log("มี animalID");
 	
 	const { data: pets, error } = await supabaseClient
      .from("pets")
