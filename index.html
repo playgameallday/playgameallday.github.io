@@ -1440,6 +1440,7 @@ async function flyToPet(){
      .from("pets")
      .select("lat, lng")
      .eq("id", animalID);
+	 .single();
 	 
 	map.flyTo(
       [pets.lat, pets.lng],
