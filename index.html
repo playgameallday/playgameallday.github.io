@@ -165,29 +165,45 @@
 
 /*-- Popup Pet Informaiom --*/
 
-/* กรอบ popup */
+.popup-gallery {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.popup-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+
+  .popup {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .popup-img-wrap {
+    width: 100%;
+    height: auto;          /* ⭐ เปลี่ยนจาก fix height */
+  }
+
+  .popup-img {
+    width: 100%;
+    height: auto;          /* ⭐ ให้รูปดันกรอบ */
+    display: block;
+  }
+  
+.leaflet-popup-content-wrapper {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
 .leaflet-popup-content {
-  width: 400px !important;
+  width: 350px !important; /* ⭐ ปรับความกว้างกรอบ popup */
   max-width: 500px;
-}
-
-/* wrapper รูป */
-.popup-img-wrap {
-  width: 100%;
-  max-height: 260px;      /* ⭐ กำหนดความสูงที่อยากได้ */
-  display: flex;          /* ⭐ จัดกลาง */
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;    /* เผื่อภาพแนวตั้ง */
-  border-radius: 12px;
-}
-
-/* ตัวรูป */
-.popup-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;    /* ⭐ สำคัญมาก */
-  display: block;
 }
 
 /*----------------------------*/
@@ -274,6 +290,12 @@ button {
 .copylink-btn {
   background: #999;
   color: #fff;
+  
+  white-space: normal;   /* ⭐ ให้ตัดบรรทัดได้ */
+  line-height: 1.2;
+  
+  text-align: center;
+  padding: 8px 6px;
 }  
 
 .preview-container {
@@ -1192,12 +1214,12 @@ function addMarker(pet) {
         
 		<button class="copylink-btn"
           onclick="copylink(${pet.petID})">
-          📣 คัดลอกเพื่อแชร์
+          📣 คัดลอก<br>เพื่อแชร์
         </button>
 		
 		<button class="copy-btn"
           onclick="copyLocation(${pet.lat}, ${pet.lng})">
-          📋 คัดลอกตำแหน่ง
+          📋 คัดลอก<br>ตำแหน่ง
         </button>
 		
 		<button class="close-btn" onclick="closePopup()">
